@@ -1,10 +1,13 @@
 <template>
-
-  <!-- Product list -->
-  <div class="product" @click="isMilkshown = true">{{ productList[0].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[0].amount }}</div>
+  <!-- <div class="product" @click="isMilkshown = true">{{ productList[0].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[0].amount }}</div>
   <div class="product" @click="isFishshown = true">{{ productList[1].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[1].amount }}</div>
   <div class="product" @click="isLettuceshown = true">{{ productList[2].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[2].amount }}</div>
-  <div class="product" @click="isRiceshown = true">{{ productList[3].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[3].amount }}</div>
+  <div class="product" @click="isRiceshown = true">{{ productList[3].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[3].amount }}</div> -->
+
+  <!-- Product list -->
+  <div class="product" v-for="product in productList" :key="product">
+    <div>{{ product.name }}&nbsp;&nbsp;&nbsp;$ {{ product.amount }}</div>
+  </div>
 
   <!-- Cart -->
   <div class="main-cart">
@@ -13,7 +16,12 @@
       <div v-if="showProduct(product.name)">{{ product.name }}&nbsp;&nbsp;&nbsp;$ {{ product.amount }}</div>
     </div>
 
-    <div>Total: $ </div>
+    <!-- <div class="product" v-if="isMilkshown">{{ productList[0].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[0].amount }}</div>
+    <div class="product" v-if="isFishshown">{{ productList[1].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[1].amount }}</div>
+    <div class="product" v-if="isLettuceshown">{{ productList[2].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[2].amount }}</div>
+    <div class="product" v-if="isRiceshown">{{ productList[3].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[3].amount }}</div> -->
+
+    <div>Total: $ 0</div>
   </div>
 </template>
 
