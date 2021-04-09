@@ -1,19 +1,30 @@
 <template>
-
-  <!-- Product list -->
-  <div class="product" @click="isMilkshown = true">{{ productList[0].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[0].amount }}</div>
-  <div class="product" @click="isFishshown = true">{{ productList[1].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[1].amount }}</div>
-  <div class="product" @click="isLettuceshown = true">{{ productList[2].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[2].amount }}</div>
-  <div class="product" @click="isRiceshown = true">{{ productList[3].name }}&nbsp;&nbsp;&nbsp;$ {{ productList[3].amount }}</div>
-
-  <!-- Cart -->
-  <div class="main-cart">
-    <div>Cart</div>
-    <div class="main-cart-list" v-for="product in productList" :key="product">
-      <div v-if="showProduct(product.name)">{{ product.name }}&nbsp;&nbsp;&nbsp;$ {{ product.amount }}</div>
+  <div class="main-wrap">
+    <div class="item-list">
+      <div class="item" v-for="item in itemList" :key="item" @click="addToCart(item)" :class="{ selected: item.isSelected === true }">
+        <div>{{ item.name }}</div>
+        <div>${{ item.amount }}</div>
+      </div>
     </div>
-
-    <div>Total: $ </div>
+    <div class="cart">
+      <div class="item" v-for="item in itemList" :key="item">
+        <div class="item-wrap" v-if="item.isSelected === true">
+          <div>{{ item.name }}</div>
+          <div>@ &nbsp; {{ item.quantity }} x</div>
+          <div>${{ item.amount }}</div>
+          <div>${{ item.amount * item.quantity }}</div>
+          <div class="control-wrap">
+            <div @click="updateItemQty('subract', item)">-</div>
+            <div @click="updateItemQty('add', item)">+</div>
+            <div @click="removeItem(item)">x</div>
+          </div>
+        </div>
+      </div>
+      <div class="total" v-if="calculateTotal > 0">
+        <div>Total</div>
+        <div>${{ calculateTotal }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,34 +32,51 @@
 export default {
   data() {
     return {
-      productList: [
-        { name: "Milk", amount: 10 },
-        { name: "Fish", amount: 20 },
-        { name: "Lettuce", amount: 5 },
-        { name: "Rice", amount: 2.5 }
-      ],
+      itemList: [
+        { name: "Milk", amount: 10, isSelected: false, quantity: 0 },
+        { name: "Fish", amount: 20, isSelected: false, quantity: 0 },
+        { name: "Lettuce", amount: 30, isSelected: false, quantity: 0 },
+        { name: "Rice", amount: 5, isSelected: false, quantity: 0 }
+      ]
+    }
+  },
 
-      isMilkshown: false,
-      isFishshown: false,
-      isLettuceshown: false,
-      isRiceshown: false
+  computed: {
+    calculateTotal() {
+      let total = 0
+      for (const item of this.itemList) {
+        total = total + item.quantity * item.amount
+      }
+      return total
     }
   },
 
   methods: {
-    showProduct(name) {
-      if (name === "Milk" && this.isMilkshown === false) {
-        return false
-      } else if (name === "Fish" && this.isFishshown === false) {
-        return false
-      } else if (name === "Lettuce" && this.isLettuceshown === false) {
-        return false
-      } else if (name === "Rice" && this.isRiceshown === false) {
-        return false
+    addToCart(item) {
+      item.isSelected = !item.isSelected
+      if (item.isSelected === true) {
+        item.quantity++
       } else {
-        return true
+        item.quantity = 0
       }
     },
+
+    updateItemQty(mode, item) {
+      if (mode === "add") {
+        item.quantity++
+      } else {
+        if (item.quantity > 0) {
+          item.quantity--
+        } else {
+          item.isSelected = false
+        }
+      }
+    },
+
+    removeItem(item) {
+      item.isSelected = false
+      item.quantity = 0
+    }
   }
 }
 </script>
@@ -56,34 +84,74 @@ export default {
 <style lang="scss">
 body {
   font-family: Source Sans Pro, sans-serif;
+}
 
-  .product {
-    cursor: pointer;
-    margin: 0 0 1rem 0;
-    background-color: rgba(#111, 0.1);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    width: 6rem;
+.main-wrap {
+  display: flex;
+  justify-content: space-between;
 
-    &:hover {
-      background-color: rgba(#111, 0.2);
+  .item-list {
+    .item {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(#ddd, 1);
+      margin: 0.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      width: 10rem;
+      cursor: pointer;
+    }
+
+    .selected {
+      background-color: rgba(#eee, 1);
+      color: rgba(#a3a3a3, 1);
     }
   }
 
-  .main-cart {
-    // display: flex;
-    // cursor: pointer;
-    margin: 0 0 1rem 0;
-    background-color: rgba(#111, 1);
-    color: rgba(#fff, 0.8);
-    width: 6rem;
-    padding: 0.5rem;
-
-    .main-cart-list {
+  .cart {
+    .item {
       display: flex;
-      // cursor: pointer;
-      margin: 0 0 0.5rem 0;
-      color: rgba(#fff, 0.8);
+      width: 20rem;
+
+      .item-wrap {
+        display: flex;
+        flex: 1;
+        justify-content: space-between;
+        background-color: rgba(#ddd, 1);
+        margin: 0.25rem;
+        height: 1.5rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        align-items: center;
+
+        &:hover {
+          .control-wrap {
+            display: flex;
+          }
+        }
+
+        .control-wrap {
+          display: none;
+
+          div {
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            background-color: rgba(#ff9200, 1);
+            border-radius: 0.5rem;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(#111, 1);
+      color: rgba(#fff, 1);
+      padding: 1rem;
+      margin: 0.25rem;
+      border-radius: 0.5rem;
     }
   }
 }
